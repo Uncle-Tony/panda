@@ -167,17 +167,11 @@ void ignition_can_hook(CANPacket_t *msg) {
     }
 
     // Rivian R1S/T GEN1 exception
-    if ((msg->addr == 0x152U) && (len == 8)) {
-      // 0x152 overlaps with Subaru pre-global which has this bit as the high beam
-      int counter = msg->data[1] & 0xFU;  // max is only 14
-
-      static int prev_counter_rivian = -1;
-      if ((counter == ((prev_counter_rivian + 1) % 15)) && (prev_counter_rivian != -1)) {
-        // VDM_OutputSignals->VDM_EpasPowerMode
-        ignition_can = ((msg->data[7] >> 4U) & 0x3U) == 1U;  // VDM_EpasPowerMode_Drive_On=1
-        ignition_can_cnt = 0U;
-      }
-      prev_counter_rivian = counter;
+    if ((msg->addr == 0x380U) && (len == 5)) {
+      // EPAS_SystemStatus->EPAS_StcUnavailable (bit 34, Motorola)
+      // 0 = Stc_Available (EPAS operational = ignition on)
+      ignition_can = ((msg->data[4] >> 2U) & 0x1U) == 0U;
+      ignition_can_cnt = 0U;
     }
 
     // Tesla Model 3/Y exception
