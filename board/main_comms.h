@@ -44,7 +44,7 @@ static int get_health_pkt(void *dat) {
 
   health->sound_output_level_pkt = sound_output_level;
 
-  health->controls_allowed_lateral_pkt = controls_allowed;
+  health->controls_allowed_lateral_pkt = controls_allowed || mads_is_lateral_control_allowed_by_mads();
   health->controls_allowed_longitudinal_pkt = controls_allowed;
 
   return sizeof(*health);
